@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Root>
+  <Record id="1">
+    <Login>
+      <Login>Login</Login>
+    </Login>
+    <Username>
+      <Username>Password</Username>
+    </Username>
+    <Abxcdf>
+      <Abxcdf>PasswordAbxcdf</Abxcdf>
+    </Abxcdf>
+    <defefef>
+      <defefef>Passworddefefef</defefef>
+    </defefef>
+    <ttttt>
+      <ttttt>Passwordttttt</ttttt>
+    </ttttt>
+    <xyzxzxc>
+      <xyzxzxc>Passwordxyzxzxc</xyzxzxc>
+    </xyzxzxc>
+  </Record>
+  <Record id="2">
+    <Login>
+      <Login>Data</Login>
+    </Login>
+    <Username>
+      <Username>Capture</Username>
+    </Username>
+    <Abxcdf>
+      <Abxcdf>Abxcdf.img</Abxcdf>
+    </Abxcdf>
+    <defefef>
+      <defefef>defefef.png</defefef>
+    </defefef>
+    <ttttt>
+      <ttttt>ttttt.ttt</ttttt>
+    </ttttt>
+    <xyzxzxc>
+      <xyzxzxc>xyzxzxc.acvb</xyzxzxc>
+    </xyzxzxc>
+  </Record>
+  <Record id="3">
+    <Login>
+      <Login>TestComponent</Login>
+    </Login>
+    <Username>
+      <Username>TestParametter</Username>
+    </Username>
+    <Abxcdf>
+      <Abxcdf>vallue1</Abxcdf>
+    </Abxcdf>
+    <defefef>
+      <defefef>vallue12</defefef>
+    </defefef>
+    <ttttt>
+      <ttttt>vallue13</ttttt>
+    </ttttt>
+    <xyzxzxc>
+      <xyzxzxc>vallue14</xyzxzxc>
+    </xyzxzxc>
+  </Record>
+</Root>

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Root>
+  <Record id="1">
+    <Login>
+      <Username>Abxcdf</Username>
+      <Password>PasswordAbxcdf</Password>
+    </Login>
+    <DataInfor>
+      <Capture>Abxcdf.img</Capture>
+    </DataInfor>
+    <TestComponent>
+      <TestParametter>vallue1</TestParametter>
+    </TestComponent>
+  </Record>
+  <Record id="2">
+    <Login>
+      <Username>defefef</Username>
+      <Password>Passworddefefef</Password>
+    </Login>
+    <DataInfor>
+      <Capture>defefef.png</Capture>
+    </DataInfor>
+    <TestComponent>
+      <TestParametter>vallue12</TestParametter>
+    </TestComponent>
+  </Record>
+  <Record id="3">
+    <Login>
+      <Username>ttttt</Username>
+      <Password>Passwordttttt</Password>
+    </Login>
+    <DataInfor>
+      <Capture>ttttt.ttt</Capture>
+    </DataInfor>
+    <TestComponent>
+      <TestParametter>vallue13</TestParametter>
+    </TestComponent>
+  </Record>
+  <Record id="4">
+    <Login>
+      <Username>xyzxzxc</Username>
+      <Password>Passwordxyzxzxc</Password>
+    </Login>
+    <DataInfor>
+      <Capture>xyzxzxc.acvb</Capture>
+    </DataInfor>
+    <TestComponent>
+      <TestParametter>vallue14</TestParametter>
+    </TestComponent>
+  </Record>
+</Root>

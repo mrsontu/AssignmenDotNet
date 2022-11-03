@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Root>
+  <Record id="1">
+    <col id="1">Login</col>
+    <col id="2">Password</col>
+    <col id="3">PasswordAbxcdf</col>
+    <col id="4">Passworddefefef</col>
+    <col id="5">Passwordttttt</col>
+    <col id="6">Passwordxyzxzxc</col>
+  </Record>
+  <Record id="2">
+    <col id="1">Data</col>
+    <col id="2">Capture</col>
+    <col id="3">Abxcdf.img</col>
+    <col id="4">defefef.png</col>
+    <col id="5">ttttt.ttt</col>
+    <col id="6">xyzxzxc.acvb</col>
+  </Record>
+</Root>
