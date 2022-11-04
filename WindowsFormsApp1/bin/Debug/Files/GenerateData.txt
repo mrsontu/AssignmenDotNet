@@ -1,4 +1,0 @@
-﻿Login,Username,Abxcdf,defefef,ttttt,xyzxzxc
-Login,Password,PasswordAbxcdf,Passworddefefef,Passwordttttt,Passwordxyzxzxc
-Data,Capture,Abxcdf.img,defefef.png,ttttt.ttt,xyzxzxc.acvb
-TestComponent,TestParametter,vallue1,vallue12,vallue13,vallue14
