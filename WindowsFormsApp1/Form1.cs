@@ -73,8 +73,12 @@ namespace WindowsFormsApp1
                         lock (this.ExcelFilePath)
                         {
                             DataCollection dataCollection = new DataCollection();
-                            dataCollection = dataCollection.ReadDataFromExcel(this.ExcelFilePath, startHeader);
-                            dataCollection.ExportToXML(dataCollection, path);
+                            //dataCollection = dataCollection.ReadDataFromExcel(this.ExcelFilePath, startHeader);
+                            int endOfHeader;
+                            var headers = dataCollection.GetHeadersFromExcel(this.ExcelFilePath, out endOfHeader);
+                            var cells = dataCollection.GetCellsFromExcel(this.ExcelFilePath, endOfHeader);
+                            dataCollection.ExportToXML(path, cells, headers);
+                            //dataCollection.ExportToXML(dataCollection, path);
                         }
                     });
                     this.Enabled = true;

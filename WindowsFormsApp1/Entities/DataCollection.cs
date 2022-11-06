@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using static OfficeOpenXml.ExcelWorksheet;
 
 namespace WindowsFormsApp1.Entities
 {
@@ -173,7 +174,7 @@ namespace WindowsFormsApp1.Entities
                 for (int i = 1; i <= cols; i++)
                 {
                     Data data = new Data();
-                    int countNotMerged = worksheet.Cells.Where(x => !x.Merge).Count();
+                    int countNotMerged = worksheet.Cells.Where(x => x.Merge).Count();
                     if (worksheet.Cells[1, 1, 1, cols].Merge == false)
                     {
                         if (startRowHeader == 0)
@@ -230,6 +231,120 @@ namespace WindowsFormsApp1.Entities
 
             }
             return null;
+
+        }
+
+        public List<ExHeader> GetHeadersFromExcel(string filePath, out int endOfHeader)
+        {
+            endOfHeader = 0;
+            List<ExHeader> headers = new List<ExHeader>();
+            Action<int, int, int, string> addHeader = (start, end, row, value) =>
+            {
+                headers.Add(new ExHeader
+                {
+                    StartCol = start,
+                    EndCol = end,
+                    RowIndex = row,
+                    Value = value
+                });
+            };
+            FileInfo fileInfo = new FileInfo(filePath);
+            if (fileInfo.Exists)
+            {
+                ExcelPackage package = new ExcelPackage(fileInfo);
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                int rows = worksheet.Dimension.End.Row;
+                int cols = worksheet.Dimension.End.Column;
+
+                for(int row = 1; row<=rows; row++)
+                {
+                    var isMerge = false;
+                    int col, startOfMergedCol;
+                    col = startOfMergedCol = 1;
+                    string value = string.Empty;
+                    while(col <= cols)
+                    {
+                        var currentValue = worksheet.Cells[row, col].Value;
+                        value = currentValue !=null ? currentValue.ToString() : value;
+                        //[int FromRow, int FromCol, int ToRow, int ToCol]
+                        if ( worksheet.Cells[row, startOfMergedCol, row, col].Merge) //Cell đã merge theo row 
+                        {
+                            isMerge = true;
+                            // currentValue có thể bằng null nếu cell đã được merge
+                            if (headers.Any())
+                            {
+                                if(currentValue == null)
+                                {
+                                    ExHeader item = headers.Where(x => col >= x.StartCol && row == x.RowIndex).OrderByDescending(x => x.EndCol).FirstOrDefault();
+                                    if (item != null)
+                                    {
+                                        var mergedRange = GetMergedRange(worksheet.MergedCells, new ExPosition { Col = item.StartCol, Row = item.RowIndex });
+                                        if(mergedRange.InsideRange(new ExPosition { Col = col, Row = row })){
+                                            item.EndCol = col;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // Cell đã được merge theo column
+                                    startOfMergedCol = col;
+                                    addHeader(startOfMergedCol, col, row, value);
+                                }                             
+                            }
+                            else if (currentValue != null) 
+                                addHeader(startOfMergedCol, col, row, value);
+                        }
+                        else if (currentValue != null) // currentValue == null => Cell có thể đã được merge theo column => Bỏ qua luôn không cần update rowIndex
+                        {
+                            startOfMergedCol = col;
+                            addHeader(startOfMergedCol, col, row, value);
+                        }
+
+                        col++;
+                    }
+
+                    if(!isMerge)
+                    {
+                        endOfHeader = row;
+                        break;
+                    }
+                }
+            }
+
+            return headers;
+
+        }
+
+        public List<List<ExCell>> GetCellsFromExcel(string filePath, int endOfHeader)
+        {
+            List<List<ExCell>> excelCells = new List<List<ExCell>>();
+            FileInfo fileInfo = new FileInfo(filePath);
+            if (fileInfo.Exists)
+            {
+                ExcelPackage package = new ExcelPackage(fileInfo);
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                int rows = worksheet.Dimension.End.Row;
+                int cols = worksheet.Dimension.End.Column;
+
+                for (int row = endOfHeader + 1; row <= rows; row++)
+                {
+                    List<ExCell> rowData = new List<ExCell>();
+                    for(int col = 1; col <= cols; col++)
+                    {
+                        var currentValue = worksheet.Cells[row, col].Value;
+                        var value = currentValue != null ? currentValue.ToString() : string.Empty;
+                        rowData.Add(new ExCell()
+                        {
+                            Value = value,
+                            Col = col
+                        });
+                    }
+
+                    excelCells.Add(rowData);
+                }
+            }
+
+            return excelCells;
 
         }
         public bool ExportToXML(DataCollection dataCollection, string filePath)
@@ -319,6 +434,44 @@ namespace WindowsFormsApp1.Entities
             return true;
         }
 
+        public bool ExportToXML(string filePath, List<List<ExCell>> rows, List<ExHeader> headers)
+        {
+            var sts = new XmlWriterSettings()
+            {
+                Indent = true,
+            };
+
+            using (var writer = XmlWriter.Create(filePath, sts))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("Root");
+                int rowIndex = 1;
+                foreach(var row in rows)
+                {
+                    writer.WriteStartElement("Record");
+                    writer.WriteAttributeString("id", (rowIndex).ToString());
+                    int colIndex = 1;
+                    foreach(var cell in row)
+                    {
+                        var startElements = headers.Where(x => x.StartCol == colIndex).OrderBy(x => x.RowIndex).ToList();
+                        var endElements = headers.Where(x => x.EndCol == colIndex).OrderByDescending(x => x.RowIndex).ToList();
+                        startElements.ForEach(x => writer.WriteStartElement(RemoveSignalUnicodeCharacters(x.Value)));
+                        writer.WriteString(cell.Value);
+                        endElements.ForEach(x => writer.WriteEndElement());
+                        colIndex++;
+                    }
+
+                    writer.WriteEndElement();
+                    rowIndex++;
+                }             
+
+                writer.WriteEndDocument();
+                writer.Flush();
+                writer.Close();
+            }
+            return true;
+        }
+
 
         public string RemoveSignalUnicodeCharacters(string str)
         {
@@ -339,6 +492,72 @@ namespace WindowsFormsApp1.Entities
             result = Regex.Replace(result, @"[^\u0000-\u007F]+", string.Empty);
             result = Regex.Replace(result, @"[!@#$%^&*()_+\-=\[\]{};\':\\\|,.<>\/?]", string.Empty);
             return result;
+        }
+
+        public ExRange GetMergedRange(MergeCellsCollection ranges, ExPosition position)
+        {
+            Func<string, ExPosition> convertAddressToPoint = (address) =>
+            {
+                var numbericArray = ToNumericCoordinates(address).Split(',');
+                string columnId = numbericArray.First();
+                string rowId = numbericArray.Last();
+                return new ExPosition()
+                {
+                    Col = Convert.ToInt32(columnId),
+                    Row = Convert.ToInt32(rowId)
+                };
+            };
+
+            IEnumerable<ExRange> exRanges = ranges.Select(range =>
+            {
+                string[] points = range.Split(':');
+                return new ExRange()
+                {
+                    StartPoint = convertAddressToPoint(points.First()),
+                    EndPoint = convertAddressToPoint(points.Last())
+                };
+            });
+
+            return exRanges.FirstOrDefault(x => x.InsideRange(position));
+        }
+
+        public string ToNumericCoordinates(string coordinates)
+        {
+            string ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string first = string.Empty;
+            string second = string.Empty;
+
+            CharEnumerator ce = coordinates.GetEnumerator();
+            while (ce.MoveNext())
+                if (char.IsLetter(ce.Current))
+                    first += ce.Current;
+                else
+                    second += ce.Current;
+
+            int i = 0;
+            ce = first.GetEnumerator();
+            while (ce.MoveNext())
+                i = (26 * i) + ALPHABET.IndexOf(ce.Current) + 1;
+
+            string str = i.ToString();
+            return str + "," + second;
+        }
+
+        public int ExcelColumnNameToNumber(string columnName)
+        {
+            if (string.IsNullOrEmpty(columnName)) throw new ArgumentNullException("columnName");
+
+            columnName = columnName.ToUpperInvariant();
+
+            int sum = 0;
+
+            for (int i = 0; i < columnName.Length; i++)
+            {
+                sum *= 26;
+                sum += (columnName[i] - 'A' + 1);
+            }
+
+            return sum;
         }
     }
 }

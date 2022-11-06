@@ -61,6 +61,7 @@
     <Compile Include="Entities\Data.cs" />
     <Compile Include="Entities\DataCollection.cs" />
     <Compile Include="Entities\DataFromText.cs" />
+    <Compile Include="Entities\ExcelElements.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
